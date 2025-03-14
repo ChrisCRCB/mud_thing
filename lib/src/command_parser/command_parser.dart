@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:mud_thing/mud_thing.dart';
@@ -7,33 +6,12 @@ import 'package:mud_thing/mud_thing.dart';
 /// A parser for commands.
 class CommandParser {
   /// Create an instance.
-  CommandParser(this.world) : commands = [], _running = false {
-    commands.addAll([
-      PlayerCommand(
-        name: 'quit',
-        description: 'Quit the game.',
-        command: (final parser, final arguments) {
-          CommandError.emptyArguments(arguments);
-          parser.shutdown();
-        },
-        aliases: ['@quit', 'shutdown', '@shutdown'],
-      ),
-      PlayerCommand(
-        name: 'console',
-        description: 'Shows the height and width of the console.',
-        command: (final parser, final arguments) {
-          outputText('Number of lines: ${stdout.terminalLines}.');
-          outputText('Terminal columns: ${stdout.terminalColumns}.');
-          outputText(
-            'Escape sequences supported: ${stdout.supportsAnsiEscapes}.',
-          );
-          outputText('Line terminator: ${jsonEncode(stdout.lineTerminator)}.');
-          outputText('Encoding: ${stdout.encoding.name}.');
-        },
-        aliases: ['@console'],
-      ),
-    ]);
-  }
+  CommandParser(this.world) : commands = [], _running = false;
+
+  /// Create a parser with default commands.
+  CommandParser.withDefaultCommands(this.world)
+    : commands = [QuitCommand(), ConsoleCommand()],
+      _running = false;
 
   /// Whether the parser is running.
   bool _running;
@@ -51,6 +29,11 @@ class CommandParser {
       stdout
         ..write(text)
         ..write(end ?? Platform.lineTerminator);
+
+  /// Output multiple [lines].
+  void outputLines(final Iterable<String> lines) {
+    lines.forEach(outputText);
+  }
 
   /// Split [input] into a list of [String]s.
   ///
@@ -81,7 +64,7 @@ class CommandParser {
       for (final command in commands) {
         if (command.name == commandName ||
             command.aliases.contains(commandName)) {
-          return command.command(this, arguments);
+          return command.run(this, arguments);
         }
       }
       throw CommandError(world.commandNotFound);

@@ -7,17 +7,28 @@ part 'room.g.dart';
 @JsonSerializable()
 class Room {
   /// Create an instance.
-  Room({this.name = 'Untitled Room', this.description});
+  Room({
+    required this.id,
+    this.name = 'Untitled Room',
+    this.description,
+    final Map<ExitDirection, RoomExit>? exits,
+  }) : exits = exits ?? {};
 
   /// Create an instance from a JSON object.
   factory Room.fromJson(final Map<String, dynamic> json) =>
       _$RoomFromJson(json);
+
+  /// The ID of this room.
+  final String id;
 
   /// The name of this room.
   String name;
 
   /// The description of this room.
   String? description;
+
+  /// The exits from this room.
+  final Map<ExitDirection, RoomExit> exits;
 
   /// Convert an instance to JSON.
   Map<String, dynamic> toJson() => _$RoomToJson(this);

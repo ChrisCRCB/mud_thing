@@ -13,7 +13,7 @@ class World {
     this.commandNotFound = "I don't understand that.",
     this.shutdownMessage = 'Come back soon.',
     final List<Room>? rooms,
-  }) : rooms = rooms ?? [Room(name: 'The First Room')];
+  }) : rooms = rooms ?? [Room(id: newId(), name: 'The First Room')];
 
   /// Create an instance from a JSON object.
   factory World.fromJson(final Map<String, dynamic> json) =>
